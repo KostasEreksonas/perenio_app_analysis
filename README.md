@@ -540,6 +540,10 @@ Features that are not included in the script:
 4. Encoding separate audio/video streams into a single media file.
 5. Audio / video synchronization and frame timing for muxing.
 
+The script, however, produces playable audio and video files, with a reconstructed video frame presented below:
+
+![Reconstructed video frame](./images/12.png)
+
 # Conclusion
 
 Key points to summarize the security research of Perenio application:
