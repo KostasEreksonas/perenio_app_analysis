@@ -1,0 +1,79 @@
+{
+  "threadId": "2",
+  "builder": {
+    "algorithm": "AES/CBC/PKCS5Padding",
+    "modeBase64": 0,
+    "charsetName": "UTF8",
+    "digestAlgorithm": "SHA1",
+    "iterationCount": 1,
+    "iv": "00000000000000000000000000000000",
+    "ivParameterSpec": null,
+    "key": "A45BE7EF0543D36B4F68DvD3EF4013D4",
+    "keyAlgorithm": "AES",
+    "keyLength": 128,
+    "salt": "BDBA982FAF389694",
+    "secretKeyType": "PBKDF2WithHmacSHA1",
+    "secureRandom": null,
+    "secureRandomAlgorithm": "SHA1PRNG"
+  },
+  "getDefaultInfo": {
+    "key": "A45BE7EF0543D36B4F68DvD3EF4013D4",
+    "salt": "BDBA982FAF389694",
+    "defaultKey": "00000000000000000000000000000000"
+  },
+  "encrypted": "fDVKEevP86vks8HDWcsWwUoWhYUauso/2AssuLobQj85iUTBCLK6YJbUP7AxfFwXHjKn3F3URNgh\n/2SvLbPOPqS3wos0B9h8m/Q9jtfCVvEt3TqiLY0dSeff12q/2BmDRKpBQYHFeO+F8UKtMuNdoA==\n    ",
+  "hashTheKeyInfo": {
+    "keyPlaintext": "A45BE7EF0543D36B4F68DvD3EF4013D4",
+    "keyHashed": "zb6XIjgHtuii5dEcQuiY/8QFluA\n"
+  },
+  "SKFGetInstance": {
+    "secretKeyType": "PBKDF2WithHmacSHA1",
+    "providerName": "BC",
+    "providerVersion": 1.77,
+    "providerInfo": "BouncyCastle Security Provider v1.77"
+  },
+  "SKFGenerateSecret": {
+    "algorithm": "PBKDF2WithHmacSHA1",
+    "PBEKeySpecInfo": {
+      "iterationCount": 1,
+      "keyLength": 128,
+      "password": "zb6XIjgHtuii5dEcQuiY/8QFluA\n",
+      "salt": "BDBA982FAF389694"
+    },
+    "secretKey": "4bf14ea15d7bd3bbfcf9b7d9acc6db5c"
+  },
+  "SKSInit": {
+    "key": "4bf14ea15d7bd3bbfcf9b7d9acc6db5c",
+    "Algorithm": "AES"
+  },
+  "getSecretKeyInfo": {
+    "algorithm": "AES",
+    "keyMaterial": "4bf14ea15d7bd3bbfcf9b7d9acc6db5c"
+  },
+  "cryptoInitInfo": {
+    "opmode": 2,
+    "opmodeString": "DECRYPT",
+    "key": {
+      "keyClass": "javax.crypto.spec.SecretKeySpec",
+      "keyAlgorithm": "AES",
+      "keyFormat": "RAW",
+      "keyEncoded": "4bf14ea15d7bd3bbfcf9b7d9acc6db5c"
+    },
+    "parameters": {
+      "parameterClass": "javax.crypto.spec.IvParameterSpec",
+      "parameterValue": "00000000000000000000000000000000"
+    },
+    "secureRandom": {
+      "secureRandomClass": "java.security.SecureRandom",
+      "secureRandomAlgorithm": "SHA1PRNG",
+      "secureRandomProvider": "AndroidOpenSSL version 1.0"
+    }
+  },
+  "decrypted": {
+    "commonPrefs": {
+      "display_rate_us_after": 0,
+      "permission_event_severity": "event"
+    },
+    "devicePrefs": {}
+  }
+}

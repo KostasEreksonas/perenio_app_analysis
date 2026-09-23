@@ -1,0 +1,24 @@
+[project]
+name = "perenio-app-analysis"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "KostasEreksonas", email = "k.ereksonas@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "crypto>=1.4.1",
+    "dotenv>=0.9.9",
+    "frida>=17.18.0",
+    "frida-tools>=14.10.4",
+    "pycryptodome>=3.23.0",
+    "scapy>=2.7.0",
+]
+
+[project.scripts]
+perenio-app-analysis = "perenio_app_analysis:main"
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13.0"]
+build-backend = "uv_build"

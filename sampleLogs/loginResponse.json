@@ -1,0 +1,9 @@
+{
+    "access_token": "<access-token>",
+    "expires_in": 864000,
+    "not-before-policy": 0,
+    "refresh_token": "<refresh-token>",
+    "refresh_expires_in": 51840000,
+    "session_state": "<session-state>",
+    "token_type": "bearer"
+}

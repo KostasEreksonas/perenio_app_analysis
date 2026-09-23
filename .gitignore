@@ -1,0 +1,5 @@
+.env
+.venv/
+audio.wav
+capture.pcap
+video.h264
