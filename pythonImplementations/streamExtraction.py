@@ -57,6 +57,8 @@ class Stream(object):
     def parseRTPHeader(self, data):
         """
         Parse fixed RTP header
+        CSRC Count (CC) and Extension (X) header bits were observed to be 0 for Peifc01 IP camera
+        CSRC byte and extension data parsing is not accounted for
         This does not account for CSRC bytes because all observed RTP packets for Peifc01 IP camera had extension bit set to 0
         """
         version = int(data[0] >> 6)
@@ -89,7 +91,7 @@ class Stream(object):
     def fragmentationUnitIndicator(self, indicator):
         """Parse Fragmentation Unit (FU) Identifier and Header bytes"""
         fBit = (indicator >> 7) & 1
-        nri = indicator & 0b01100000
+        nri = (indicator >> 5) & 0b11
         nalUnitType_I = indicator & 0b00011111
 
         return fBit, nri, nalUnitType_I
@@ -152,6 +154,8 @@ class Stream(object):
                         self.videoInfo['payload']['fuHeader']['fullHeader'].append(payload[1])
                         self.videoInfo['payload']['isFragment'].append(True)
                         self.videoInfo['payload']['data'].append(payload[2:])
+                    elif nalUnitType_I == 29:
+                        pass
                     else:
                         self.videoInfo['payload']['fuHeader']['startBit'].append("")
                         self.videoInfo['payload']['fuHeader']['endBit'].append("")
@@ -182,7 +186,10 @@ class Stream(object):
         return [data[i] for i in sortedIndices]
 
     def sortVideoIndices(self):
-        """Sort indices of out-of-order RTP packets, containing NAL units"""
+        """
+        Sort indices of out-of-order RTP packets, containing NAL units
+        Sort by timestamp first, if multiple packets have the same timestamp, sort by sequence number
+        """
         packetCount = len(self.videoInfo["sequenceNumber"])
         unwrappedSequence = self.unwrapSequenceNumber(self.videoInfo['sequenceNumber'])
         return sorted(range(packetCount), key=lambda i: (self.videoInfo["timestamp"][i], unwrappedSequence[i]))
@@ -202,7 +209,10 @@ class Stream(object):
         self.videoInfo["payload"]["data"] = self.reorder(self.videoInfo["payload"]["data"], sortedIndices)
 
     def sortAudioIndices(self):
-        """Sort indices of out-of-order RTP packets, containing NAL units"""
+        """
+        Sort indices of out-of-order RTP packets, containing audio data
+        Sort by timestamp first, if multiple packets have the same timestamp, sort by sequence number
+        """
         packetCount = len(self.audioInfo["sequenceNumber"])
         unwrappedSequence = self.unwrapSequenceNumber(self.audioInfo['sequenceNumber'])
         return sorted(range(packetCount), key=lambda i: (self.audioInfo["timestamp"][i], unwrappedSequence[i]))
@@ -214,10 +224,12 @@ class Stream(object):
             self.audioInfo[key] = self.reorder(self.audioInfo[key], sortedIndices)
 
     def keepIndices(self, info):
+        """Keep indices of non-duplicate RTP packets only"""
         seq = info['sequenceNumber']
         return [i for i in range(len(seq)) if i == 0 or seq[i] != seq[i-1]]
 
     def removeDuplicates(self, media):
+        """Remove duplicated RTP packets"""
         if media == "video":
             indicesToKeep = self.keepIndices(self.videoInfo)
             for key in ["version", "padding", "extension", "csrcCount", "marker", "type", "sequenceNumber", "timestamp", "ssrcIdentifier"]:
@@ -272,10 +284,12 @@ class Stream(object):
             self.audioBuffer += sample
 
     def saveVideoStream(self):
+        """Export video buffer as H.264 video file"""
         with open("video.h264", "wb") as videoFile:
             videoFile.write(self.videoBuffer)
 
     def saveAudioStream(self):
+        """Save audio stream as Waveform Audio File"""
         with wave.open("audio.wav", "wb") as audioFile:
             audioFile.setnchannels(1)
             audioFile.setsampwidth(2)

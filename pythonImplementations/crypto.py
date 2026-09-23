@@ -17,7 +17,7 @@ class LocalAESCipher(object):
         sha1Hash = sha1(self.key).digest()
 
         b64 = base64.b64encode(sha1Hash).decode('utf-8')
-        b64 = b64.rstrip('=') + '\n'
+        b64 = b64.rstrip('=') + '\n' # Account for Android's Base64.NO_PADDING that emits a trailing newline 
     
         return b64.encode('utf-8')
 

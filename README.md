@@ -251,7 +251,7 @@ This method works roughly as follows:
     * `PBEKeySpec` is instantiated with the following parameters:
       * Iteration count: 1.
       * Key length: 128-bit.
-      * Password: output from `hashTheKey` method.
+      * Password: output from `hashTheKey` method (PBKDF2 password represented as a Java character array).
       * Salt: a value that is also hardcoded into Perenio Android application.
     * The `generateSecret` method computes secret key from the previously listed parameters. 
 3. Java `Cipher` object is instantiated with the transformation `AES/CBC/PKCS5Padding` and is initialized with:
@@ -274,15 +274,24 @@ Sample outputs of dynamic analysis script [can be found in sampleLogs directory]
 
 ## Security Findings
 
-A few notable things, related to the app's cryptographic security:  
+A few notable considerations regarding the cryptographic methods used in the Perenio Android application:  
 
 1. Key and salt values are hardcoded into the Perenio Android application.
 2. Initialization vector (IV) is initialized as a 16 byte long value of all-zeros.
-3. Password-Based Key Derivation Function 2 (PBKDF2) has an iteration count of ***1***. 
-4. SecureRandom is instantiated but never used.
-5. Key, derived with the aforementioned parameters, is being reused for subsequent local cryptographic operations.
+3. Having a static key combined with all-zero IV makes AES-CBC deterministic - same plaintext inputs produce the same ciphertext outputs.
+4. SecureRandom is instantiated but is never used to derive IV.
+5. Password-Based Key Derivation Function 2 (PBKDF2) has an iteration count of ***1***:
+    * PBKDF2 iteration count determines how many times the hashing process of key material should be repeated.
+    * On the first iteration, input key is mixed with the salt and hashed.
+    * Subsequent iterations takes hash output of previous iteration and re-hashes it with the same method.
+    * As a final step, outputs of all iterations are combined (typically with a bitwise XOR) to produce the final encryption key.
+    * [OWASP recommends 1,400,000 iterations for PBKDF2-HMAC-SHA1 (legacy) key derivation function](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html).
+    * Perenio app's crypto implementation repeats the hashing process exactly 1 time, which, combined with hardcoded key, salt and all-zero IV provide no real security on the local data.
+6. Key, derived with the aforementioned parameters, is being reused for subsequent local cryptographic operations.
 
 ***Note:*** This is an app-only encryption method. Data in-transit is still being guarded by TLSv1.3, as well as SSL certificates pinned within Perenio Android application.
+
+Given the points listed above, the in-app security layer reads more like an obfuscation layer rather than true random, non-deterministic encryption method.
 
 # Login Sequence
 
@@ -468,7 +477,7 @@ After a fixed header and CSRC identifiers (if present, RTP packet can have 0 to 
 
 ## Video Encoding
 
-As a video stream codec, H.264 (also known as Advanced Video Coding - AVC) is used. When a video is encoded with a standard like H.264, the stream is sliced into Network Abstraction Layer (NAL) units for reliable data transmission over a network. However, RTP over UDP has a limit for how large a single network packet can be. This limit is called Maximum Transmission Unit (MTU) and for Ethernet/Wi-Fi networks it is 1500 bytes, ***including*** packet headers. Accounting for Ethernet/IPv4/UDP/RTP headers, 1446 bytes are left for the payload, ***at most*** (additional header information is added to RTP packet if the packet has CSRC identifiers and/or is being sent via VPN/IPSec tunnel).
+As a video stream codec, H.264 (also known as Advanced Video Coding - AVC) is used. When a video is encoded with a standard like H.264, the stream is sliced into Network Abstraction Layer (NAL) units for reliable data transmission over a network. However, RTP over UDP has a limit for how large a single network packet can be. This limit is called Maximum Transmission Unit (MTU) and for Ethernet/Wi-Fi networks it usually is 1500 bytes, ***including*** packet headers. Accounting for Ethernet/IPv4/UDP/RTP headers leaves 1460 bytes ***at most*** for the payload (additional header information is added to RTP packet if the packet has CSRC identifiers and/or is being sent via VPN/IPSec tunnel).
 
 Anyways, a large NAL unit can exceed single MTU, which means that such a NAL unit has to be split into multiple RTP packets for a successful transmission. For this purpose, H.264 has a defined Fragmentation Unit (FU), comprised of 1-byte FU Indicator and 1-byte FU Header. NAL header is reconstructed with `Original NAL Header Byte = (FU Indicator & 0xE0) | (FU Header & 0x1F)`
 
@@ -505,7 +514,7 @@ Visual FU Header structure from [RFC 6184 standard, section 5.8](https://www.rfc
 
 ![FU Header byte structure](./images/11.png)
 
-When a NAL unit is fragmented into FU-A (and FU-B) units, original NAL header is computed by concatenating first 3 bits of FU identifier and last 5 bits of FU Header:
+When a NAL unit is fragmented into FU-A (and FU-B) units, the original one-byte NAL header is reconstructed by preserving the F and NRI bits from the FU indicator and taking the NAL-unit type from the FU header
 
 ```
 (FU Identifier & 0xE0) | (FU Header & 0x1F)
