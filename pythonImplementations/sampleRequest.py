@@ -57,8 +57,7 @@ def getUserInfo(token):
             "tenantid": "perenio",
             "accept-encoding": "gzip",
             "user-agent": "okhttp/4.10.0"
-        },
-        data={}
+        }
     )
 
     response.raise_for_status()

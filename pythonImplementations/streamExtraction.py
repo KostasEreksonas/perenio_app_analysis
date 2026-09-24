@@ -154,8 +154,6 @@ class Stream(object):
                         self.videoInfo['payload']['fuHeader']['fullHeader'].append(payload[1])
                         self.videoInfo['payload']['isFragment'].append(True)
                         self.videoInfo['payload']['data'].append(payload[2:])
-                    elif nalUnitType_I == 29:
-                        pass
                     else:
                         self.videoInfo['payload']['fuHeader']['startBit'].append("")
                         self.videoInfo['payload']['fuHeader']['endBit'].append("")
@@ -270,6 +268,8 @@ class Stream(object):
             if endBit == 1:
                 self.nalBuffer += bytes(self.videoInfo['payload']['data'][i]) if not startBit else b''
                 self.videoBuffer += self.nalBuffer
+                # Flush NAL buffer
+                self.nalBuffer = bytearray()
             elif not startBit:
                 self.nalBuffer += bytes(self.videoInfo['payload']['data'][i])
 
@@ -297,7 +297,8 @@ class Stream(object):
             audioFile.writeframes(self.audioBuffer)
 
 
-def main():
+def saveStreams():
+    """Save audio/video streams into separate files"""
     stream = Stream()
 
     stream.collectStreams()
@@ -311,6 +312,9 @@ def main():
     stream.removeDuplicates("audio")
     stream.collectAudioStream()
     stream.saveAudioStream()
+
+def main():
+    saveStreams()
 
 if __name__ == "__main__":
     main()
