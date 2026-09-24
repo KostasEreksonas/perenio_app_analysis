@@ -479,7 +479,7 @@ After a fixed header and CSRC identifiers (if present, RTP packet can have 0 to 
 
 As a video stream codec, H.264 (also known as Advanced Video Coding - AVC) is used. When a video is encoded with a standard like H.264, the stream is sliced into Network Abstraction Layer (NAL) units for reliable data transmission over a network. However, RTP over UDP has a limit for how large a single network packet can be. This limit is called Maximum Transmission Unit (MTU) and for Ethernet/Wi-Fi networks it usually is 1500 bytes, ***including*** packet headers. Accounting for Ethernet/IPv4/UDP/RTP headers leaves 1460 bytes ***at most*** for the payload (additional header information is added to RTP packet if the packet has CSRC identifiers and/or is being sent via VPN/IPSec tunnel).
 
-Anyways, a large NAL unit can exceed single MTU, which means that such a NAL unit has to be split into multiple RTP packets for a successful transmission. For this purpose, H.264 has a defined Fragmentation Unit (FU), comprised of 1-byte FU Indicator and 1-byte FU Header. NAL header is reconstructed with `Original NAL Header Byte = (FU Indicator & 0xE0) | (FU Header & 0x1F)`
+Anyways, a large NAL unit can exceed single MTU, which means that such a NAL unit has to be split into multiple RTP packets for a successful transmission. For this purpose, H.264 has a defined Fragmentation Unit (FU), comprised of 1-byte FU Indicator and 1-byte FU Header.
 
 ### FU Indicator
 
@@ -501,7 +501,7 @@ Visual FU Indicator structure from [RFC 6184 standard, section 1.3](https://www.
 
 ### FU Header
 
-FU Header byte is present only on NAL Fragmentation Units and is constructed against [RFC 6184 standard, section 5.8](https://www.rfc-editor.org/info/rfc6184/#section-5.8)
+FU Header byte is present only on NAL Fragmentation Units and is constructed against [RFC 6184 standard, section 5.8](https://www.rfc-editor.org/info/rfc6184/#section-5.8):
 
 |Bits|Name|Description|
 |:--:|:--:|:---------:|
@@ -514,7 +514,7 @@ Visual FU Header structure from [RFC 6184 standard, section 5.8](https://www.rfc
 
 ![FU Header byte structure](./images/11.png)
 
-When a NAL unit is fragmented into FU-A (and FU-B) units, the original one-byte NAL header is reconstructed by preserving the F and NRI bits from the FU indicator and taking the NAL-unit type from the FU header
+When a NAL unit is fragmented into FU-A (and FU-B) units, the original one-byte NAL header is reconstructed by preserving the F and NRI bits from the FU indicator and taking the NAL-unit type from the FU header:
 
 ```
 (FU Identifier & 0xE0) | (FU Header & 0x1F)
@@ -553,5 +553,4 @@ Key points to summarize the security research of Perenio application:
     * Wi-Fi Pre-Shared Key (PSK) for the Wireless Local Area Network (WLAN), where Peifc01 IP camera resides.
     * Wi-Fi adapter in monitor mode.
     * Captures 4-way handshake as Peifc01 IP camera connects to the network.
- on a same Local Area Network (LAN), knows Wi-Fi pre-shared key (PSK) and  .
 4. AWS EC2 instance relays the encoded file with combined audio/video to the Perenio Android application via Secure RTP (SRTP).
