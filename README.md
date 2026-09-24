@@ -234,11 +234,11 @@ During the app initialization stage, Frida overloads for `getDefaultBuilder` and
 
 Secret key for both `encrypt` and `decrypt` operations is built upon a hardcoded key in `hashTheKey` method:
 
-![Hashing function of hardcoded key](./images/5.png)
+![Hashing function of hardcoded key](./images/4.png)
 
 As an example, let's take `Encryption.encrypt()` method:
 
-![Encryption.encrypt() method](./images/4.png)
+![Encryption.encrypt() method](./images/5.png)
 
 This method works roughly as follows:
 
