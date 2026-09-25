@@ -302,7 +302,7 @@ Login sequence was intercepted using Mitmproxy and captured with Wireshark for a
 
 Tricking Android device into trusting my proxy for establishing TLSv1.3 session with it is as simple as injecting Mitmproxy's CA certificates onto Android system trust store ([Bash automation script for this process can be found here](https://github.com/KostasEreksonas/android_analysis/blob/main/scripts/inject_certificates)). For pinned certificate bypass, Frida objection with `android sslpinning disable` script was used.
 
-***Note:*** For dynamic analysis with Frida, `frida-server` must be loaded and run on a target device as a daemon, so that a Frida client on a host machine could have a "harness" to be able to attach to a process and inspect/modify it.
+***Note:*** For dynamic analysis with Frida, `frida-server` must be loaded and run on a target device as a daemon, so that a Frida client on host machine could have a harness that can be attached to a process for inspection and modification purposes.
 
 A quick description of the algorithm used for capturing plain text communication between Perenio Android app and vendor's servers might be this:
 
